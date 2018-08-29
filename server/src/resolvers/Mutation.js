@@ -1,9 +1,13 @@
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
-const { APP_SECRET, getUserId } = require('../utils')
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { APP_SECRET, getUserId } = require('../utils');
 
 function post(parent, { url, description }, ctx, info) {
-  return ctx.db.mutation.createLink({ data: { url, description } }, info)
+  const userId = getUserId(ctx);
+  return ctx.db.mutation.createLink(
+    { data: { url, description, postedBy: { connect: { id: userId } } } },
+    info,
+  );
 }
 
 async function signup(parent, args, ctx, info) {
@@ -16,8 +20,8 @@ async function signup(parent, args, ctx, info) {
 
   return {
     token,
-    user,
-  }
+    user
+  };
 }
 
 async function login(parent, args, ctx, info) {
